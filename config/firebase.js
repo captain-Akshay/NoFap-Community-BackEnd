@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 export default{
     apiKey: process.env.FIREBASE_API,
     authDomain: "chat-5fa46.firebaseapp.com",
