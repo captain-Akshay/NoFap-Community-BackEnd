@@ -253,11 +253,10 @@ app.post("/posts",upload.single("picture"), async (req,res)=>{
     if (!token) {
       return res.status(403).send("Access Denied");
     }
-    const verify=TokenModel.find({"token":token});
-
+    const verify= await TokenModel.find({"token":token});
     if(!verify)return res.status(403).send("Access Denied");
     const userMail=req.body.mail;
-    if(userMail!==verify[0].mail)return res.status(403).send("Access Denied");
+    if(userMail!==verify[0].uid)return res.status(403).send("Access Denied");
     const userId=req.body.userId;
     const desc=req.body.description;
     const postPic=ref(cloudStorage,`postPic/${userMail}-${req.body.picturePath}`);
@@ -290,7 +289,7 @@ app.get("/posts",async(req,res)=>{
     if (!token) {
       return res.status(403).send("Access Denied");
     }
-    const verify=TokenModel.find({"token":token});
+    const verify=await TokenModel.find({"token":token});
     if(!verify)return res.status(403).send("Access Denied");
     const post=await Post.find().sort({createAt:-1});
     res.status(200).json(post);}
@@ -306,7 +305,7 @@ app.get("/posts/:uid", async (req,res)=>{
     if (!token) {
       return res.status(403).send("Access Denied");
     }
-    const verify=TokenModel.find({"token":token});
+    const verify=await TokenModel.find({"token":token});
     if(!verify)return res.status(403).send("Access Denied");
     const userId=req.params.uid;
     const post= await Post.find({userId:userId});
@@ -322,10 +321,10 @@ app.patch("/likes/:id",async(req,res)=>{
         if (!token) {
           return res.status(403).send("Access Denied");
         }
-        const verify=TokenModel.find({"token":token});
+        const verify= await TokenModel.find({"token":token});
         if(!verify)return res.status(403).send("Access Denied");
-    const userMail=req.body.userMail;
-    if(userMail!==verify[0].mail) return res.status(403).send("Access Denied");
+        const userMail=req.body.mail;
+        if(userMail!==verify[0].uid)return res.status(403).send("Access Denied");
     const id=req.params.id;
     const userId=req.body.userId;
     const post=await Post.findById(id);
@@ -350,10 +349,10 @@ app.patch("/streak/:id",async(req,res)=>{
         if (!token) {
           return res.status(403).send("Access Denied");
         }
-        const verify=TokenModel.find({"token":token});
+        const verify= await TokenModel.find({"token":token});
         if(!verify)return res.status(403).send("Access Denied");
-    const userMail=req.body.userMail;
-    if(userMail!==verify[0].mail)res.status(403).send("Access Denied");
+        const userMail=req.body.mail;
+        if(userMail!==verify[0].uid)return res.status(403).send("Access Denied");
     const id=req.params.id;
     const updatedUser= await User.findOneAndUpdate(
     {id:id},{streak:new Date()},{new:true});
