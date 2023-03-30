@@ -257,7 +257,7 @@ app.post("/posts",upload.single("picture"), async (req,res)=>{
 
     if(!verify)return res.status(403).send("Access Denied");
     const userMail=req.body.mail;
-    if(userMail!==verify.mail)res.status(403).send("Access Denied");
+    if(userMail!==verify.mail)return res.status(403).send("Access Denied");
     const userId=req.body.userId;
     const desc=req.body.description;
     const postPic=ref(cloudStorage,`postPic/${userMail}-${req.body.picturePath}`);
@@ -325,10 +325,9 @@ app.patch("/likes/:id",async(req,res)=>{
         const verify=TokenModel.find({"token":token});
         if(!verify)return res.status(403).send("Access Denied");
     const userMail=req.body.userMail;
-    if(userMail!==verify.mail)res.status(403).send("Access Denied");
+    if(userMail!==verify.mail) return res.status(403).send("Access Denied");
     const id=req.params.id;
     const userId=req.body.userId;
-    // Post.findById
     const post=await Post.findById(id);
     const isLiked=post.likes.get(userId);
     if(isLiked){
