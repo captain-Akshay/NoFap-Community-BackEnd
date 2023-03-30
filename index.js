@@ -6,7 +6,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
 import helmet from "helmet";
-import fetch from "node-fetch";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -234,6 +233,7 @@ app.get("/user/:uid",async (req,res)=>{
       return res.status(403).send("Access Denied");
     }
     const verify= await TokenModel.find({"token":token});
+
     if(!verify)return res.status(403).send("Access Denied");
     const mail=verify[0].uid;
     const uid=req.params.uid;
@@ -254,8 +254,10 @@ app.post("/posts",upload.single("picture"), async (req,res)=>{
       return res.status(403).send("Access Denied");
     }
     const verify=TokenModel.find({"token":token});
+
     if(!verify)return res.status(403).send("Access Denied");
     const userMail=req.body.mail;
+    if(userMail!==verify.mail)res.status(403).send("Access Denied");
     const userId=req.body.userId;
     const desc=req.body.description;
     const postPic=ref(cloudStorage,`postPic/${userMail}-${req.body.picturePath}`);
@@ -266,8 +268,6 @@ app.post("/posts",upload.single("picture"), async (req,res)=>{
     const postURL= await getDownloadURL(snapshot.ref);
     
     const user= await User.findOne({id:userId});
-    console.log(userId);
-    console.log(user);
     const newPost=new Post({
         userId:userId,
         name:user.name,
@@ -324,6 +324,8 @@ app.patch("/likes/:id",async(req,res)=>{
         }
         const verify=TokenModel.find({"token":token});
         if(!verify)return res.status(403).send("Access Denied");
+    const userMail=req.body.userMail;
+    if(userMail!==verify.mail)res.status(403).send("Access Denied");
     const id=req.params.id;
     const userId=req.body.userId;
     // Post.findById
@@ -351,8 +353,9 @@ app.patch("/streak/:id",async(req,res)=>{
         }
         const verify=TokenModel.find({"token":token});
         if(!verify)return res.status(403).send("Access Denied");
+    const userMail=req.body.userMail;
+    if(userMail!==verify.mail)res.status(403).send("Access Denied");
     const id=req.params.id;
-    console.log(id);
     const updatedUser= await User.findOneAndUpdate(
     {id:id},{streak:new Date()},{new:true});
     res.status(200).json(updatedUser);}
