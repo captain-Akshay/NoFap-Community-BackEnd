@@ -351,7 +351,7 @@ app.patch("/streak/:id",async(req,res)=>{
         }
         const verify= await TokenModel.find({"token":token});
         if(!verify)return res.status(403).send("Access Denied");
-        const userMail=req.body.mail;
+        const userMail=req.body.userMail;
         if(userMail!==verify[0].uid)return res.status(403).send("Access Denied");
     const id=req.params.id;
     const updatedUser= await User.findOneAndUpdate(
